@@ -1,0 +1,370 @@
+EJERCICIO 1
+
+1 - Crear la estructura de directorios
+
+Crear directorio
+New-item -itemtype directory -name Simpsons
+
+2 - Crear grupo y usuarios
+
+Crear usuario
+New-localUser -name Homer
+
+Crear grupo
+New-localgroup -name CasaSimpsons
+
+Añadir usuario a grupo
+Add-localgroupmember -group "CasaSimpsons" -Member "Homer"
+
+3 - Permisos de carpetas
+
+Seleccionar Carpeta
+$Acl = Get-Acl "D:\SIMPSONS\BarDeMoe"
+
+Crear regla de acceso lectura y ejecucion
+$Ar = New-Object System.Security.AccessControl.FileSystemAccessRule("BarDeMoe","ReadAndExecute","Allow")
+
+Crear regla de acceso escritura
+$Ar = New-Object System.Security.AccessControl.FileSystemAccessRule("BarDeMoe","Write","Allow")
+
+Crear reglas de denegacion
+Mismos comando pero en vez de "Allow" se pone "Deny"
+
+Aplicar regla en carpeta
+$Acl.SetAccessRule($Ar)
+
+Aplicar cambios
+Set-Acl "D:\SIMPSONS\BarDeMoe" $Acl
+
+4 - Comprobar acceso
+
+Acceder a otro usuario
+Start-Process powershell -Credential "Moe"
+
+Acceder a carpeta
+cd D:\SIMPSONS\BarDeMoe
+
+5- Acceso a usuario
+
+Dar acceso a usuario a carpeta
+Set-Acl -Path D:\SIMPSONS\BarDeMoe -AclObject (New-Acl -AccessControlType Allow -Principal "Homer" -Rights FullControl)
+
+6 - Cuota de entrada
+
+New-FsrmQuota -Path "C:\ruta\carpeta1" -UserName "usuario1" -Size 1GB -WarningLevel 1MB
+
+7 -  Directivas de auditoria
+HACER
+
+---------------------------------------------------------------------------------------------------
+
+EJERCICIO 2
+
+1 - Abrir el administrador de tareas
+
+Abrir el administrador
+start-process taskmgr.exe
+
+3 - Gestion del proceso mspaint.exe
+
+Abrir el programa
+start-process mspaint.exe
+
+Averiguar su ID de proceso
+get-process -name mspaint
+
+Averiguar la ubicacion
+get-process -name mspaint -fileversioninfo
+
+6 - Abrir el MemTest
+
+Abrir
+start-process MdSched.exe
+
+12 - Iniciar, detener servicios
+
+Iniciar proceso
+start-service -name MySQL80
+
+Terminar proceso
+stop-service -name MySQL80
+
+Cambiar tipo de inicio
+Set-Service -name MySQL80 -startuptype manual
+Set-Service -name MySQL80 -startuptype automatic
+
+----------------------------------------------------------------------------------------------------
+
+EJERCICIO 3
+
+Script 1 - Mostrar la tabla de multiplicar de un numero introducido por el usuario
+$number = Read-Host "Introduce un numero"
+Write-Host "Tabla de $number"
+for($i = 1; $i -le 10; $i++){
+    $result = [int]$number * [int]$i
+	Write-Host "$number * $i = $result"
+}
+
+-----------------------------------------------------------------------------------------------------
+
+Script 2 - Generacion y adivinacion en 1 intento de numero aleatorio
+$aletNumber = Get-Random -Minimum 1 -Maximum 20
+$userNumber = Read-Host "Introduce un numero del 1 al 20"
+
+if($userNumber -eq $aletNumber){
+    Write-Host "$userNumber es igual que $aletNumber"
+}
+else{
+    if($userNumber -lt $aletNumber){
+        Write-Host "$userNumber es menor que $aletNumber"
+    }
+    else{
+        Write-Host "$userNumber es mayor que $aletNumber"
+    }
+}
+
+----------------------------------------------------------------------------------------------------
+
+Script 3 - Misma variante pero infinitamente hasta que se acierte
+$aletNumber = Get-Random -Minimum 1 -Maximum 20
+$userNumber = Read-Host "Introduce un numero del 1 al 20"
+
+[int]$tries = 1;
+for($i = 0; $i -le $tries; $i++){
+    $userNumber = Read-Host "Introduce un numero del 1 al 20"
+    if($userNumber -eq $aletNumber){
+        Write-Host "$userNumber es igual que $aletNumber"
+        $i = $tries;
+    }
+    else{
+        if($userNumber -lt $aletNumber){
+            Write-Host "$userNumber es menor"
+            $tries++;
+        }
+        else{
+            Write-Host "$userNumber es mayor"
+            $tries++;
+        }
+    }
+}
+Write-Host "Has acertado en $tries intentos!"
+
+------------------------------------------------------------------------------------------------
+
+Script 4 - Generar 5 numeros aleatorios y mostrar su cantidad en asteriscos
+for($i = 0; $i -le 5; $i++){
+    $aletNumber = Get-Random -Minimum 1 -Maximum 10
+    
+    $added = ""
+    for($j = 1; $j -le $aletNumber; $j++){
+        $added += "*"
+    }
+    Write-Host "$aletNumber $added"
+}
+
+------------------------------------------------------------------------------------------------
+
+Script 5 - Ver usuarios o grupos
+$choose = Read-Host "Quieres ver usuarios o grupos? (u para usuarios - g para grupos)"
+
+if($choose -eq "u"){
+    Get-LocalUser
+}
+else{
+    if($choose -eq "g"){
+        Get-LocalGroup
+    }
+}
+
+-------------------------------------------------------------------------------------------------
+
+Script 6 - Mostrar los servicios como html
+Get-Service | ConvertTo-Html | Out-File services.html
+
+-------------------------------------------------------------------------------------------------
+
+POWERSHELL
+
+Get-command get-help -syntax
+-	Te muestra todas las posibles sintaxis del cmdlet Get-help
+
+Get-command -verb get
+-	Te muestra los cmdlets y scripts que poseen el verbo Get
+
+Get-command -noun service
+-	Te muestra los cmdlets y scripts que tienen el sustantivo service
+
+Get-command -commandtype Alias
+-	Te muestra los alias de comandos disponibles en el sistema
+
+(get-date).Date
+-	Te muestra un objeto DateTime de la fecha actual, solo mostrando la fecha y no la hora
+
+(get-date).Day
+-	Te muestra un objeto DateTime de la fecha actual, mostrado solo el día de hoy
+
+(get-date).Month
+-	Te muestra un objeto DateTime de la fecha actual, mostrando solo el mes actual
+
+(get-date).Year
+-	Te muestra un objeto DateTime de la fecha actual, mostrando solo el año actual
+
+Get-date | get-member –MemberType method
+-	Te muestra los métodos del CMDLET Get-Date
+
+(get-date).ToString()
+-	Te muestra un objeto DateTime de la fecha actual en formato cadena de caracteres
+
+(get-date).addDays(4)
+-	Te muestra un objeto DateTime de la fecha actual, añadiendo 4 días a la fecha
+
+(get-date).addDays(4).ToString()
+-	Te muestra un objeto DateTime de la fecha actual en formato cadena de caracteres, añadiendo 4 dias
+
+Get-date | get-member
+-	Te muestra los métodos, alias y propiedades del CMDLET Get-Date
+
+Get-Process -Name powershell
+-	Te muestra los procesos con el nombre powershell
+
+Get-Process -Name powershell | Format-Wide
+-	Te muestra los procesos con el nombre powershell en formato tabla con una sola propiedad, en este caso el nombre
+
+Get-Process -Name powershell | Format-Wide -Property Id
+-	Te muestra los procesos con el nombre powershell en formato tabla con una sola propiedad, en este caso el id del proceso
+
+Get-Process -Name powershell |Format-Wide -Property Name -Column 1
+-	Te muestra los procesos con el nombre powershell en formato tabla con una sola propiedad y con una sola columna especificada, en este caso el nombre del proceso
+
+Get-Process -Name powershell | Format-List
+-	Te muestra los procesos con el nombre powershell con su lista de propiedades en una nueva línea cada una
+
+Get-Process -Name powershell | Format-List -Property ProcessName,FileVersion,StartTime,Id
+-	Te muestra los procesos con el nombre powershell con su lista de propiedades en una nueva línea cada una, en el orden de Nombre de proceso, Versión del fichero, Fecha y hora de inicio e ID
+
+Get-Process -Name powershell | Format-List -Property *
+-	Te muestra los procesos con el nombre powershell con su lista de propiedades en una nueva línea cada una, mostrando todas las propiedades con cualquier nombre y extension
+
+Get-Process -Name powershell | Format-Table
+-	Te muestra los procesos con el nombre powershell en formato tabla
+
+Get-Process -Name powershell | Format-Table –Property Path,Name,Id,Company
+-	Te muestra las propiedades de los procesos con nombre powershell en el orden de Ruta, Nombre, ID y Compañia
+
+Get-Process -Name powershell | Format-Table -Property Path,Name,Id,Company –AutoSize
+-	Te muestra las propiedades de los procesos con nombre powershell en el orden de Ruta, Nombre, ID y Compañía, ajustando el tamaño de la columna en base al tamaño de los datos que contiene
+
+Get-Process -Name powershell | Format-Table -Property Company,Name,Id,Path -AutoSize
+-	Te muestra las propiedades de los procesos con nombre powershell en el orden de Compañía, Nombre, ID y Ruta, ajustando el tamaño de la columna en base al tamaño de los datos que contiene
+
+Get-Process -Name powershell | Format-Table -Wrap -Property Name,Id,Company,Path
+-	Te muestra las propiedades de los procesos con nombre powershell en el orden de Nombre, ID, Compañía y Ruta, poniendo el texto excedente en una nueva línea
+
+Get-Process -Name powershell | Format-Table -Wrap -AutoSize -Property Name,Id,Company,Path
+-	Te muestra las propiedades de los procesos con nombre powershell en el orden de Nombre, ID, Compañía y Ruta, poniendo el texto excedente en una nueva línea y ajustando el tamaño de la columna en base al tamaño de los datos que contiene
+
+Get-Process | Format-Table -Wrap -AutoSize -Property Path,Id,Company,Name
+-	Te muestra todos los procesos del sistema en formato tabla, con el texto excedente en una nueva línea, ajustando el tamaño de la columna en base al tamaño de su contenido y mostrando las propiedades de los procesos en orden de Ruta, ID, Compañía y Nombre
+
+Get-Process | Format-Table -Wrap -AutoSize -Property Name,Id,Path -GroupBy Company
+-	Te muestra todos los procesos del sistema en formato tabla, ajustando el tamaño de la columna en base al tamaño de su contenido, separando lo mostrado en base a su propiedad Compañía mostrando las propiedades en orden de Nombre, ID y Ruta
+
+Copy-Item -Path c:\bootmgr -Destination bootmgr.bak
+-	Copia el archivo bootmgr en C: y lo guarda en la misma ubicación en un archivo bootmgr.bak
+
+Get-childitem -force
+-	Te muestra todos los archivos y carpetas de la ubicación actual
+
+Copy-Item -Path c:\bootmgr -Destination  bootmgr.bak –Force
+-	Copia el archivo bootmgr en C: y lo guarda en la misma ubicación en un archivo bootmgr.bak, sobrescribiendo cualquier archivo que ya existiera con ese nombre
+
+Copy-Item Pictures -Recurse PicturesDelete
+-	Copia todos los archivos y carpetas de Pictures y los guarda en una nueva carpeta PicturesDelete
+
+Remove-Item bootmgr.bak –Force
+-	Elimina el archivo bootmgr.bak y sobrescribe cualquier archivo con ese mismo nombre 
+
+Remove-Item PicturesDelete –Recurse -Force
+-	Elimina la carpeta PicturesDelete y todo su contenido, sobrescribiendo cualquiera que tuviera el mismo nombre
+
+Copy-Item -Filter *.png -Path Pictures -Recurse -Destination PicturesTemp
+-	Copia todos los archivos con la extensión .png en la carpeta Pictures y subcarpetas y lo guarda en una nueva carpeta llamada PicturesTemp
+
+new-item -path . -name testfile1.txt -itemtype file -value “Esto es una cadena“
+-	Crea un nuevo archivo .txt llamado testfile1 en el directorio local con el contenido “Esto es una cadena”
+
+Get-content testfile1.txt
+-	Muestra el contenido del fichero testfile1.txt
+
+new-item -name logfiles -itemtype directory
+-	Crea un nuevo directorio logfiles en el directorio local
+
+new-item -path $profile -itemtype file –force
+-	Crea un nuevo archive en la ruta de la variable $profile y sobrescribe cualquiera que ya existiera con ese nombre
+
+new-item -itemtype file -path test.txt, test.log
+-	Crea dos archivos, uno test.txt y otro test.log en el directorio actual
+
+rename-item .\test.txt -newname otro.txt
+-	Cambia el nombre del archivo test.txt por otro.txt en el directorio actual
+
+Get-childitem
+-	Te muestra todos los archivos y directorios que contiene el directorio actual
+
+move-item -path otro.txt -destination documents\old.txt
+-	Mueve el archive otro.txt al archivo old.txt en Documentos
+
+move-item -path PicturesTemp -destination PicturesNew
+-	Mueve el directorio PicturesTemp a PicturesNew
+
+move-item -path .\*.txt -destination PicturesNew
+-	Mueve todos los .txt del directorio actual y sus subdirectorios al directorio PicturesNew
+
+Get-ChildItem -Path .\*.txt -Recurse | Move-Item -Destination PicturesNew
+-	Recoge todos los archivos .txt del directorio actual y sus subdirectorios, y los mueve al directorio PicturesNew
+
+new-item -path . -name testfile1.txt -itemtype file -value “Esto es una cadena“
+(añade al menos otras 7 lineas de contenido al archivo)
+-	Crea un nuevo archivo testfile1.txt en el directorio actual con el contenido “Esto es una cadena…”
+
+copy-item -path .\testfile1.txt  -destination .\testfile2.txt
+-	Copia el archivo testfile1.txt del directorio actual con el nombre testfile2.txt en el directorio actual
+
+Get-Content -Path testfile2.txt
+-	Te muestra el contenido del archivo testfile2.txt
+
+(Get-Content testfile2.txt -TotalCount 5)[-1]
+-	Te muestra la última línea del archivo testfile2.txt cuando el contenido tenga un total de 5 líneas
+
+get-date | set-content date.csv
+-	Te muestra la fecha y hora actual y lo guarda en el archivo date.csv
+
+Get-Content testfile2.txt -TotalCount 7 | Set-Content testfile3.txt
+-	Recoge las primeras 7 líneas del archivo testfile2.txt y las pone en un nuevo archivo testfile3.txt en el directorio actual
+
+"Hello","HELLO" | select-string -pattern "HELLO" -casesensitive
+-	Busca en el texto recibido el patrón HELLO diferenciando entre mayúsculas y minúsculas
+
+get-childitem *.txt -recurse | select-string -pattern “cadena“
+-	Busca la cadena “cadena” en todos los archivos .txt del directorio actual y sus subdirectorios
+
+select-string -pattern “^[Pp].+(as)$” -path lista_compra.txt
+-	Busca por líneas en el archivo lista_compra.txt las que empiecen por p o P, caracteres de por medio y termina en as
+
+Líneas que empiecen por m ó p y acaben en s
+-	select-string -pattern “^[MmPp].*(s)$”
+
+Líneas que comienzan por n
+-	select-string -pattern “^[Nn].”
+
+Líneas con 3 aes
+-	select-string -pattern “.*(aes).*(aes) .*(aes).”
+
+Líneas que no acaban en as
+-	select-string -pattern “^.*(?!as)$”
+
+Líneas con 8 caracteres al menos
+-	select-string -pattern “^.(8,)$”
+
+Líneas que no contienen ni p ni t
+-	select-string -pattern “^(?!.*[PpTt]).*$”
