@@ -368,3 +368,53 @@ Líneas con 8 caracteres al menos
 
 Líneas que no contienen ni p ni t
 -	select-string -pattern “^(?!.*[PpTt]).*$”
+
+Get-Location | Out-Host -paging -passthru
+	Out-Host permite mostrar la salida de forma “lenta” cuando la salida producida es muy larga
+	Out-Host –paging por ejemplo permite mostrar la salida página a página
+	-PassThru: información sobre el resultado del comando.
+	
+Get-date | Get-member | Out-host -paging
+	Te muestra los miembros de Get-Date
+	
+Select-Object: este cmdlet nos permite seleccionar propiedades de los objetos del pipeline para construir nuevos 		contenido sólo las propiedades seleccionadas.
+	-Property: lista de las propiedades seleccionadas para construir nuestro nuevo objeto.
+	Podemos consultar las propiedades del nuevo objeto con get-member
+	Por ejemplo:
+	get-date|get-member -MemberType Properties
+	get-date|Select-Object -Property day,month,year
+	get-date|Select-Object -Property day,month,year|get-member
+	get-date|Select-Object -Property day,month,year|Format-List
+
+Sort-Object: este cmdlet nos permite ordenar los objetos del pipeline basándonos en los valores de las propiedades de los 	objetos.
+	-Property: lista de las propiedades seleccionadas para ordenar los objetos.
+	Por ejemplo:
+	Get-Childitem -Path "C:\Users\usuario\"|Sort-Object -Property Name
+	Get-Childitem -Path "C:\Users\usuario\"|Sort-Object -Property Name -Descending 
+	Get-Childitem -Path "C:\Users\usuario\"|Sort-Object -Property Name|Select-Object -Property  	CreationTime,LastWriteTime,FullName
+	Get-Childitem -Path "C:\Users\usuario\"|Sort-Object -Property Name|Select-Object -Property CreationTime,LastWriteTime,FullName|Format-List
+
+Get-content: para obtener el contenido de un ítem. Devuelve un array de objetos, donde cada elemento representa una línea 	del contenido
+	-path: ruta del ítem
+	-Head n: devuelve las n primeras líneas del item
+	-Tail n: devuelve las n últimas líneas del ítem
+
+Select-string: búsqueda de texto y patrones en cadenas y archivos.  Por defecto busca la primera ocurrencia en cada línea.
+	-path:ruta del archivo donde buscar
+	-allmatches: todas las ocurrencias en cada línea
+	-pattern: expresión regular para la búsqueda
+
+Get-help about_Regular_Expressions
+	Te muestra la info sobre las expresiones regulares
+
+------------------------------------------------------------------------------------
+
+CARACTERES RESERVADOS
+
+^ - Busca los caracteres iniciales
+$ - Busca los caracteres finales
+* - Busca una cantidad indefinida de caracteres
+? - Busca una instancia del caracter que le precede - EJ "valla" -match "v?"
+\ - Busca el caracter que sigue como un caracter marcado con un signo de escape
+. - Busca cualquier caracter individual
+[^] - Busca cualquier caracter menos los indicados entre los corchetes - EJ "coche" -match "[^brt]oche"
